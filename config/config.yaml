@@ -1,0 +1,64 @@
+alertsentry:
+  llm:
+    provider: "anthropic"
+    model: "claude-3-5-sonnet-20241022"
+    api_key: "${ANTHROPIC_API_KEY}"
+    temperature: 0.1
+    max_tokens: 2000
+    timeout: 30
+    retry_attempts: 3
+
+  sources:
+    splunk:
+      enabled: true
+      url: "https://splunk.company.com:8089"
+      token: "${SPLUNK_TOKEN}"
+      saved_search: "Notable Events"
+      poll_interval: 60
+    
+    elastic:
+      enabled: true
+      url: "https://elastic.company.com:9200"
+      api_key: "${ELASTIC_API_KEY}"
+      index: ".siem-signals-*"
+      poll_interval: 30
+
+  threat_intel:
+    virustotal:
+      enabled: true
+      api_key: "${VT_API_KEY}"
+    abuseipdb:
+      enabled: true
+      api_key: "${ABUSEIPDB_KEY}"
+
+  outputs:
+    slack:
+      enabled: true
+      webhook_url: "${SLACK_WEBHOOK}"
+      channel: "#soc-alerts"
+      notify_on: ["true_positive", "suspicious"]
+    
+    jira:
+      enabled: true
+      url: "https://company.atlassian.net"
+      project: "SEC"
+      create_on: ["true_positive"]
+
+  database:
+    postgres:
+      host: "localhost"
+      port: 5432
+      database: "alertsentry"
+      user: "${PG_USER}"
+      password: "${PG_PASSWORD}"
+    redis:
+      host: "localhost"
+      port: 6379
+
+  analysis:
+    batch_size: 10
+    batch_timeout: 5
+    confidence_threshold: 70
+    auto_close_fp: true
+    include_historical_context: true
+    historical_lookback_hours: 24
