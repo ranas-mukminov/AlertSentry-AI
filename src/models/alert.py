@@ -3,10 +3,12 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 from .enums import Severity
 
+
 class IOC(BaseModel):
     type: str  # ip, domain, hash, url
     value: str
     reputation: Optional[Dict[str, Any]] = None
+
 
 class UnifiedAlert(BaseModel):
     id: str = Field(..., description="Unique alert ID")
@@ -17,7 +19,7 @@ class UnifiedAlert(BaseModel):
     title: str
     description: str
     raw_log: Optional[str] = None
-    
+
     # Entities
     source_ip: Optional[str] = None
     destination_ip: Optional[str] = None
@@ -25,7 +27,7 @@ class UnifiedAlert(BaseModel):
     hostname: Optional[str] = None
     process: Optional[str] = None
     file_hash: Optional[str] = None
-    
+
     # Context
     mitre_tactics: List[str] = Field(default_factory=list)
     mitre_techniques: List[str] = Field(default_factory=list)
@@ -33,6 +35,4 @@ class UnifiedAlert(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {datetime: lambda v: v.isoformat()}

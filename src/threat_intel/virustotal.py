@@ -6,13 +6,12 @@ from .cache import ti_cache
 
 logger = get_logger(__name__)
 
+
 class VirusTotalClient:
     def __init__(self):
         self.config = get_config().threat_intel.virustotal
         self.base_url = "https://www.virustotal.com/api/v3"
-        self.headers = {
-            "x-apikey": self.config.get("api_key", "")
-        }
+        self.headers = {"x-apikey": self.config.get("api_key", "")}
 
     async def get_ip_report(self, ip: str) -> Optional[Dict[str, Any]]:
         if not self.config.get("enabled"):
@@ -25,11 +24,13 @@ class VirusTotalClient:
 
         try:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(f"{self.base_url}/ip_addresses/{ip}") as response:
+                async with session.get(
+                    f"{self.base_url}/ip_addresses/{ip}"
+                ) as response:
                     if response.status == 200:
                         data = await response.json()
                         result = data.get("data", {}).get("attributes", {})
-                        
+
                         # Cache result
                         await ti_cache.set(f"vt:ip:{ip}", result)
                         return result
@@ -53,13 +54,17 @@ class VirusTotalClient:
 
         try:
             async with aiohttp.ClientSession(headers=self.headers) as session:
-                async with session.get(f"{self.base_url}/files/{file_hash}") as response:
+                async with session.get(
+                    f"{self.base_url}/files/{file_hash}"
+                ) as response:
                     if response.status == 200:
                         data = await response.json()
                         result = data.get("data", {}).get("attributes", {})
-                        
+
                         # Cache result (longer TTL for hashes)
-                        await ti_cache.set(f"vt:hash:{file_hash}", result, ttl=604800) # 7 days
+                        await ti_cache.set(
+                            f"vt:hash:{file_hash}", result, ttl=604800
+                        )  # 7 days
                         return result
                     elif response.status == 404:
                         return None

@@ -1,10 +1,10 @@
-import aiohttp
-from src.models.analysis import AnalysisResult, Classification
+from src.models.analysis import AnalysisResult
 from src.config import get_config
 from src.utils.logging import get_logger
 from .base import BaseResponder
 
 logger = get_logger(__name__)
+
 
 class JiraResponder(BaseResponder):
     def __init__(self):

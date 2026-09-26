@@ -5,6 +5,7 @@ from src.config import get_config
 
 Base = declarative_base()
 
+
 class Database:
     def __init__(self):
         self.engine = None
@@ -13,22 +14,23 @@ class Database:
     def init(self):
         config = get_config()
         db_config = config.database.postgres
-        
+
         # Construct async database URL
         # Assumes asyncpg driver
-        url = f"postgresql+asyncpg://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
-        
-        self.engine = create_async_engine(
-            url,
-            echo=False,
-            pool_size=20,
-            max_overflow=10
+        user, password = db_config["user"], db_config["password"]
+        host, port, database = (
+            db_config["host"],
+            db_config["port"],
+            db_config["database"],
         )
-        
+        url = f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}"
+
+        self.engine = create_async_engine(
+            url, echo=False, pool_size=20, max_overflow=10
+        )
+
         self.session_maker = sessionmaker(
-            self.engine,
-            class_=AsyncSession,
-            expire_on_commit=False
+            self.engine, class_=AsyncSession, expire_on_commit=False
         )
 
     async def get_session(self) -> AsyncSession:
@@ -41,7 +43,9 @@ class Database:
         if self.engine:
             await self.engine.dispose()
 
+
 db = Database()
+
 
 async def get_db():
     async for session in db.get_session():

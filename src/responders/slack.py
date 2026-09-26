@@ -1,11 +1,11 @@
+from src.models.analysis import AnalysisResult
 import aiohttp
-import json
-from src.models.analysis import AnalysisResult, Classification
 from src.config import get_config
 from src.utils.logging import get_logger
 from .base import BaseResponder
 
 logger = get_logger(__name__)
+
 
 class SlackResponder(BaseResponder):
     def __init__(self):
@@ -30,52 +30,64 @@ class SlackResponder(BaseResponder):
             async with aiohttp.ClientSession() as session:
                 async with session.post(webhook_url, json=payload) as response:
                     if response.status == 200:
-                        logger.info(f"Sent notification to Slack for alert {analysis.alert_id}")
+                        logger.info(
+                            f"Sent notification to Slack for alert {analysis.alert_id}"
+                        )
                         return True
                     else:
-                        logger.error(f"Failed to send Slack notification: {response.status}")
+                        logger.error(
+                            f"Failed to send Slack notification: {response.status}"
+                        )
                         return False
         except Exception as e:
             logger.error(f"Error sending Slack notification: {e}")
             return False
 
     def _build_payload(self, analysis: AnalysisResult) -> dict:
-        color = "#36a64f" if analysis.classification == Classification.FALSE_POSITIVE else "#ff0000"
-        
         blocks = [
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"🚨 Alert Analysis: {analysis.classification.value.upper()}"
-                }
+                    "text": f"🚨 Alert Analysis: {analysis.classification.value.upper()}",
+                },
             },
             {
                 "type": "section",
                 "fields": [
                     {"type": "mrkdwn", "text": f"*Alert ID:*\n{analysis.alert_id}"},
-                    {"type": "mrkdwn", "text": f"*Confidence:*\n{analysis.confidence}%"},
-                    {"type": "mrkdwn", "text": f"*Severity:*\n{analysis.severity_adjusted.value}"},
-                    {"type": "mrkdwn", "text": f"*Model:*\n{analysis.llm_model}"}
-                ]
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Confidence:*\n{analysis.confidence}%",
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Severity:*\n{analysis.severity_adjusted.value}",
+                    },
+                    {"type": "mrkdwn", "text": f"*Model:*\n{analysis.llm_model}"},
+                ],
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*Reasoning:*\n{analysis.reasoning}"
-                }
-            }
+                    "text": f"*Reasoning:*\n{analysis.reasoning}",
+                },
+            },
         ]
 
         if analysis.recommended_actions:
-            actions_text = "\n".join([f"• {action}" for action in analysis.recommended_actions])
-            blocks.append({
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*Recommended Actions:*\n{actions_text}"
+            actions_text = "\n".join(
+                [f"• {action}" for action in analysis.recommended_actions]
+            )
+            blocks.append(
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Recommended Actions:*\n{actions_text}",
+                    },
                 }
-            })
+            )
 
         return {"blocks": blocks}

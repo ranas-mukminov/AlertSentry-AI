@@ -2,12 +2,12 @@ import logging
 import logging.config
 import yaml
 import os
-from typing import Optional
+
 
 def setup_logging(
     config_path: str = "config/logging.yaml",
     default_level: int = logging.INFO,
-    env_key: str = "LOG_CFG"
+    env_key: str = "LOG_CFG",
 ) -> None:
     """
     Setup logging configuration
@@ -24,6 +24,7 @@ def setup_logging(
     else:
         logging.basicConfig(level=default_level)
         print(f"Logging config file not found at {path}. Using default config.")
+
 
 def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
