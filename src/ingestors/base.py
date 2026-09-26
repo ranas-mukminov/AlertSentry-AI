@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import List, AsyncGenerator
+from typing import AsyncGenerator
 from src.models.alert import UnifiedAlert
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
 
 class BaseIngestor(ABC):
     def __init__(self, source_name: str):
@@ -14,14 +15,12 @@ class BaseIngestor(ABC):
         """
         Poll for new alerts from the source
         """
-        pass
 
     @abstractmethod
     async def test_connection(self) -> bool:
         """
         Verify connectivity to the source
         """
-        pass
 
     async def normalize_alert(self, raw_alert: dict) -> UnifiedAlert:
         """

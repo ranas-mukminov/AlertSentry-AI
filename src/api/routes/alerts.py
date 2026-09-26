@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from typing import List
 from src.models.alert import UnifiedAlert
 from src.models.analysis import AnalysisResult
 from src.analyzers.classifier import AlertClassifier
@@ -10,6 +9,7 @@ router = APIRouter()
 classifier = AlertClassifier()
 slack_responder = SlackResponder()
 jira_responder = JiraResponder()
+
 
 @router.post("/alerts", response_model=AnalysisResult)
 async def analyze_alert(alert: UnifiedAlert, background_tasks: BackgroundTasks):
@@ -23,6 +23,7 @@ async def analyze_alert(alert: UnifiedAlert, background_tasks: BackgroundTasks):
     background_tasks.add_task(jira_responder.handle_analysis, result)
 
     return result
+
 
 @router.get("/alerts/{alert_id}", response_model=AnalysisResult)
 async def get_alert_analysis(alert_id: str):

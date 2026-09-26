@@ -4,6 +4,7 @@ from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class BaseResponder(ABC):
     def __init__(self, name: str):
         self.name = name
@@ -13,4 +14,3 @@ class BaseResponder(ABC):
         """
         Take action based on analysis result
         """
-        pass

@@ -4,6 +4,7 @@ from src.db.redis import redis_client
 
 router = APIRouter()
 
+
 @router.get("/health")
 async def health_check():
     # Check DB connection
@@ -25,5 +26,5 @@ async def health_check():
     return {
         "status": "ok" if db_status == "ok" and redis_status == "ok" else "error",
         "database": db_status,
-        "redis": redis_status
+        "redis": redis_status,
     }

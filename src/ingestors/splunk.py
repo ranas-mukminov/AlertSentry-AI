@@ -1,5 +1,4 @@
 import aiohttp
-import json
 from datetime import datetime
 from typing import AsyncGenerator, Dict, Any
 from src.models.alert import UnifiedAlert, Severity
@@ -8,6 +7,7 @@ from .base import BaseIngestor
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
 
 class SplunkIngestor(BaseIngestor):
     def __init__(self):
@@ -19,14 +19,14 @@ class SplunkIngestor(BaseIngestor):
             return
 
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession():
                 # Mock implementation for now as we don't have a real Splunk instance
                 # In a real scenario, we would call the Splunk REST API
                 # url = f"{self.config.url}/services/search/jobs/export"
-                
+
                 # Simulating fetching alerts
                 logger.info("Polling Splunk for new alerts...")
-                
+
                 # Yield a mock alert for demonstration
                 mock_alert = {
                     "id": "splunk-123",
@@ -35,9 +35,9 @@ class SplunkIngestor(BaseIngestor):
                     "title": "Suspicious Login Attempt",
                     "description": "Multiple failed login attempts detected from IP 192.168.1.100",
                     "source_ip": "192.168.1.100",
-                    "user": "admin"
+                    "user": "admin",
                 }
-                
+
                 yield await self.normalize_alert(mock_alert)
 
         except Exception as e:
@@ -59,5 +59,5 @@ class SplunkIngestor(BaseIngestor):
             description=raw_alert.get("description"),
             source_ip=raw_alert.get("source_ip"),
             user=raw_alert.get("user"),
-            metadata={"raw": raw_alert}
+            metadata={"raw": raw_alert},
         )

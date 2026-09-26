@@ -2,6 +2,7 @@ import redis.asyncio as redis
 from src.config import get_config
 from typing import Optional
 
+
 class RedisClient:
     def __init__(self):
         self.client: Optional[redis.Redis] = None
@@ -9,12 +10,12 @@ class RedisClient:
     def init(self):
         config = get_config()
         redis_config = config.database.redis
-        
+
         self.client = redis.Redis(
-            host=redis_config['host'],
-            port=redis_config['port'],
+            host=redis_config["host"],
+            port=redis_config["port"],
             decode_responses=True,
-            encoding="utf-8"
+            encoding="utf-8",
         )
 
     async def get_client(self) -> redis.Redis:
@@ -26,7 +27,9 @@ class RedisClient:
         if self.client:
             await self.client.close()
 
+
 redis_client = RedisClient()
+
 
 async def get_redis() -> redis.Redis:
     return await redis_client.get_client()
