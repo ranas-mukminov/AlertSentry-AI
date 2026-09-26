@@ -6,6 +6,7 @@ from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class WebhookIngestor(BaseIngestor):
     def __init__(self):
         super().__init__("webhook")
@@ -29,7 +30,9 @@ class WebhookIngestor(BaseIngestor):
         return UnifiedAlert(
             id=raw_alert.get("id", f"webhook-{datetime.utcnow().timestamp()}"),
             source=self.source_name,
-            timestamp=datetime.fromisoformat(raw_alert.get("timestamp", datetime.utcnow().isoformat())),
+            timestamp=datetime.fromisoformat(
+                raw_alert.get("timestamp", datetime.utcnow().isoformat())
+            ),
             severity=Severity[raw_alert.get("severity", "INFO").upper()],
             title=raw_alert.get("title", "Webhook Alert"),
             description=raw_alert.get("description", ""),
@@ -37,5 +40,5 @@ class WebhookIngestor(BaseIngestor):
             destination_ip=raw_alert.get("destination_ip"),
             user=raw_alert.get("user"),
             hostname=raw_alert.get("hostname"),
-            metadata={"raw": raw_alert}
+            metadata={"raw": raw_alert},
         )

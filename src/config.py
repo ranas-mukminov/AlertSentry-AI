@@ -1,8 +1,9 @@
 import os
 import yaml
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
+
 
 class LLMConfig(BaseModel):
     provider: str
@@ -13,12 +14,14 @@ class LLMConfig(BaseModel):
     timeout: int = 30
     retry_attempts: int = 3
 
+
 class SplunkConfig(BaseModel):
     enabled: bool = False
     url: Optional[str] = None
     token: Optional[str] = None
     saved_search: Optional[str] = None
     poll_interval: int = 60
+
 
 class ElasticConfig(BaseModel):
     enabled: bool = False
@@ -27,21 +30,26 @@ class ElasticConfig(BaseModel):
     index: Optional[str] = None
     poll_interval: int = 30
 
+
 class SourcesConfig(BaseModel):
     splunk: SplunkConfig = Field(default_factory=SplunkConfig)
     elastic: ElasticConfig = Field(default_factory=ElasticConfig)
+
 
 class ThreatIntelConfig(BaseModel):
     virustotal: Dict[str, Any] = Field(default_factory=dict)
     abuseipdb: Dict[str, Any] = Field(default_factory=dict)
 
+
 class OutputsConfig(BaseModel):
     slack: Dict[str, Any] = Field(default_factory=dict)
     jira: Dict[str, Any] = Field(default_factory=dict)
 
+
 class DatabaseConfig(BaseModel):
     postgres: Dict[str, Any]
     redis: Dict[str, Any]
+
 
 class AnalysisConfig(BaseModel):
     batch_size: int = 10
@@ -50,6 +58,7 @@ class AnalysisConfig(BaseModel):
     auto_close_fp: bool = True
     include_historical_context: bool = True
     historical_lookback_hours: int = 24
+
 
 class AppConfig(BaseSettings):
     llm: LLMConfig
@@ -63,13 +72,13 @@ class AppConfig(BaseSettings):
     def load(cls, config_path: str = "config/config.yaml") -> "AppConfig":
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Config file not found: {config_path}")
-        
+
         with open(config_path, "r") as f:
             raw_config = yaml.safe_load(f)
-        
+
         # Expand environment variables in the config
         expanded_config = cls._expand_env_vars(raw_config)
-        
+
         return cls(**expanded_config.get("alertsentry", {}))
 
     @staticmethod
@@ -86,13 +95,16 @@ class AppConfig(BaseSettings):
         else:
             return config
 
+
 # Global config instance
 settings: Optional[AppConfig] = None
+
 
 def load_config(path: str = "config/config.yaml") -> AppConfig:
     global settings
     settings = AppConfig.load(path)
     return settings
+
 
 def get_config() -> AppConfig:
     if settings is None:

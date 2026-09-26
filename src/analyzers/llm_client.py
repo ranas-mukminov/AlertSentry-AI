@@ -8,13 +8,14 @@ from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class LLMClient:
     def __init__(self):
         self.config = get_config().llm
         self.provider = self.config.provider
         self.model = self.config.model
         self.api_key = self.config.api_key
-        
+
         self.anthropic_client = None
         self.openai_client = None
 
@@ -42,9 +43,7 @@ class LLMClient:
             model=self.model,
             max_tokens=self.config.max_tokens,
             temperature=self.config.temperature,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            messages=[{"role": "user", "content": prompt}],
         )
         content = response.content[0].text
         return self._parse_json(content)
@@ -52,12 +51,10 @@ class LLMClient:
     async def _analyze_openai(self, prompt: str) -> Dict[str, Any]:
         response = await self.openai_client.chat.completions.create(
             model=self.model,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+            messages=[{"role": "user", "content": prompt}],
             temperature=self.config.temperature,
             max_tokens=self.config.max_tokens,
-            response_format={"type": "json_object"}
+            response_format={"type": "json_object"},
         )
         content = response.choices[0].message.content
         return self._parse_json(content)
@@ -69,7 +66,7 @@ class LLMClient:
                 content = content.split("```json")[1].split("```")[0]
             elif "```" in content:
                 content = content.split("```")[1].split("```")[0]
-            
+
             return json.loads(content.strip())
         except json.JSONDecodeError:
             logger.error(f"Failed to parse LLM response as JSON: {content}")
