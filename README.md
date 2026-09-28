@@ -18,6 +18,12 @@ AlertSentry-AI automates the first-level triage of security alerts using Large L
 - ⚡ **Real-time Response**: Automates notifications to Slack, Jira, and Teams.
 - 📊 **MITRE ATT&CK Mapping**: Maps alerts to relevant tactics and techniques.
 
+## Security notes
+
+- Triage API (`POST /api/v1/alerts`) requires `Authorization: Bearer <token>` (`ALERTSENTRY_API_TOKEN` or `API_TOKEN`).
+- Slack/Jira responders default **off** in `config/config.yaml` until you enable them and set secrets.
+- Compose publishes the API on `127.0.0.1:8000` by default; use a reverse proxy + auth for public exposure. Health (`/api/v1/health`) stays unauthenticated.
+
 ## Quick Start
 
 1. **Clone the repository**

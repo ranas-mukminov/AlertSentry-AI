@@ -4,12 +4,14 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+    # Default: loopback only. Put a reverse-proxy + auth in front for public exposure.
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/alertsentry
       - REDIS_URL=redis://redis:6379
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ALERTSENTRY_API_TOKEN=${ALERTSENTRY_API_TOKEN:?set ALERTSENTRY_API_TOKEN}
     depends_on:
       - db
       - redis
@@ -24,14 +26,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
 
   redis:
     image: redis:7-alpine
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
 
 volumes:
   postgres_data:
