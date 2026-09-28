@@ -1,11 +1,13 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+
+from src.analyzers.classifier import AlertClassifier
+from src.api.deps import require_api_token
 from src.models.alert import UnifiedAlert
 from src.models.analysis import AnalysisResult
-from src.analyzers.classifier import AlertClassifier
-from src.responders.slack import SlackResponder
 from src.responders.jira import JiraResponder
+from src.responders.slack import SlackResponder
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_api_token)])
 classifier = AlertClassifier()
 slack_responder = SlackResponder()
 jira_responder = JiraResponder()
@@ -18,7 +20,7 @@ async def analyze_alert(alert: UnifiedAlert, background_tasks: BackgroundTasks):
     if not result:
         raise HTTPException(status_code=500, detail="Analysis failed")
 
-    # Trigger responders in background
+    # Trigger responders in background (gated by config flags defaulting off)
     background_tasks.add_task(slack_responder.handle_analysis, result)
     background_tasks.add_task(jira_responder.handle_analysis, result)
 

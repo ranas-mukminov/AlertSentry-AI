@@ -33,13 +33,13 @@ alertsentry:
 
   outputs:
     slack:
-      enabled: true
+      enabled: false
       webhook_url: "${SLACK_WEBHOOK}"
       channel: "#soc-alerts"
       notify_on: ["true_positive", "suspicious"]
     
     jira:
-      enabled: true
+      enabled: false
       url: "https://company.atlassian.net"
       project: "SEC"
       create_on: ["true_positive"]
