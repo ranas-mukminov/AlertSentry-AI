@@ -40,8 +40,11 @@ AlertSentry-AI automates the first-level triage of security alerts using Large L
 
 3. **Run with Docker**
    ```bash
+   # Compose builds with context=repo root (-f docker/Dockerfile). Do not
+   # `docker build` from inside docker/ or requirements.txt/src will be missing.
    cd docker
    docker-compose up -d
+   # Or: docker build -f docker/Dockerfile .
    ```
 
 ## Architecture
