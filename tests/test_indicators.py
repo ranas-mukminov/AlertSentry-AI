@@ -28,7 +28,9 @@ def test_public_ip_rejects_internal_and_malformed(value):
 def test_public_ip_accepts_and_canonicalises_global():
     assert public_ip(" 8.8.8.8 ") == "8.8.8.8"
     assert public_ip("::ffff:8.8.8.8") == "8.8.8.8"
-    assert public_ip("2001:4860:4860:0000:0000:0000:0000:8888") == "2001:4860:4860::8888"
+    assert (
+        public_ip("2001:4860:4860:0000:0000:0000:0000:8888") == "2001:4860:4860::8888"
+    )
 
 
 def test_file_hash():
